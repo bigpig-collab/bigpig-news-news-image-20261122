@@ -2,7 +2,8 @@
 """Sunday 22 November 2026 — one page of world news. Pure stdlib.
 Writes entry.png (1024x1024) into the directory given as argv[1].
 Cream-paper broadsheet: serif masthead, illustrated leads and cards,
-dotted world map, figures band, UTC strip, date check. All art drawn in code.
+dotted world map, numbers sidebar, UTC strip, date check. All art drawn
+in code. v3: COP31 collapse lead, 26 stories, tag chips, serif headlines.
 """
 import sys
 import zlib
@@ -356,32 +357,24 @@ def scene_kyiv(s, x, y, w, h):
               base - 10, (255, 190, 60))
 
 
-def scene_cop(s, x, y, w, h):
-    for i in range(h):
-        t = i / max(1, h - 1)
-        r = int(238 - 60 * t)
-        g = int(196 - 40 * t)
-        b = int(130 + 60 * t)
-        s.bar(x, y + i, w, 1, (r, g, b))
-    s.disc(x + w - 52, y + 26, 16, (250, 200, 90))
-    s.disc(x + 52, y + 40, 26, (52, 110, 180))
-    s.bar(x + 34, y + 34, 36, 12, (90, 160, 90))
-    s.bar(x + 44, y + 52, 16, 10, (90, 160, 90))
-    s.bar(x, y + h - 52, w, 52, (122, 84, 48))
-    s.bar(x, y + h - 52, w, 4, (90, 60, 30))
-    for i, c in enumerate(((176, 30, 36), (26, 34, 64), (15, 118, 110),
-                           (184, 134, 11), (106, 76, 147), (46, 125, 50))):
-        dx = x + 18 + i * 52
-        s.disc(dx + 12, y + h - 62, 8, (232, 196, 150))
-        s.bar(dx + 4, y + h - 54, 16, 12, c)
-    for fx, c in ((x + 8, RED), (x + 60, (26, 34, 64)), (x + 112, TEAL),
-                  (x + 164, GOLD), (x + 216, PURPLE), (x + 268, GREEN)):
-        s.bar(fx, y + h - 92, 3, 40, (60, 40, 20))
-        s.bar(fx + 3, y + h - 92, 22, 14, c)
-    s.disc(x + w - 40, y + h - 30, 9, (250, 250, 250))
-    s.ring(x + w - 40, y + h - 30, 9, INK)
-    s.line(x + w - 40, y + h - 30, x + w - 40, y + h - 38, INK)
-    s.line(x + w - 40, y + h - 30, x + w - 34, y + h - 30, INK)
+def scene_collapse(s, x, y, w, h):
+    for i in range(h - 54):
+        t = i / max(1, h - 55)
+        s.bar(x, y + i, w, 1, (int(232 - 30 * t), int(214 - 60 * t),
+                               int(170 - 40 * t)))
+    s.bar(x, y + h - 54, w, 54, (120, 96, 66))
+    for r in range(3):
+        for cx in range(5):
+            dx = x + 14 + cx * (w // 5)
+            dy = y + h - 48 + r * 14
+            s.bar(dx, dy, w // 8, 9, (70, 52, 38))
+            s.disc(dx + w // 16, dy - 4, 4, (232, 196, 150))
+    s.bar(x + w // 2 - 40, y + h - 30, 80, 22, (60, 44, 30))
+    s.bar(x + w // 2 - 46, y + h - 34, 92, 5, (90, 66, 44))
+    s.bar(x + w // 2 - 14, y + h - 40, 16, 5, (120, 90, 60))
+    s.bar(x + w // 2 + 4, y + h - 40, 4, 12, (90, 66, 44))
+    s.bar(x + 8, y + h - 84, w - 16, 22, RED)
+    s.text("NO DEAL", x + 12, y + h - 79, SANS, 2, (255, 255, 255))
 
 
 def scene_bahrain(s, x, y, w, h):
@@ -510,17 +503,20 @@ def scene_power(s, x, y, w, h):
                 s.bar(x + wx, wy, 3, 4, (255, 214, 110))
 
 
-def scene_chart(s, x, y, w, h):
-    s.bar(x, y, w, h, (250, 250, 244))
-    s.bar(x + 8, y + 8, 2, h - 16, GREY)
-    s.bar(x + 8, y + h - 8, w - 16, 2, GREY)
-    pts = [(14, 14), (40, 18), (66, 16), (92, 26), (118, 24), (144, 36),
-           (168, 42)]
-    for a, b in zip(pts, pts[1:]):
-        s.line(x + a[0], y + a[1], x + b[0], y + b[1], RED)
-        s.line(x + a[0], y + a[1] + 1, x + b[0], y + b[1] + 1, RED)
-    s.tri(x + 168, y + 46, x + 158, y + 40, x + 168, y + 36, RED)
-    s.text("-14%", x + 118, y + 30, SANS, 1, RED)
+def scene_fire(s, x, y, w, h):
+    s.bar(x, y, w, h, (52, 48, 58))
+    s.bar(x + 30, y + 16, 130, h - 16, (24, 22, 26))
+    for wx in (44, 70, 96, 122, 148):
+        s.bar(x + wx, y + 22, 8, 8, ORANGE)
+    for fx in (50, 90, 130):
+        s.tri(x + fx, y + 16, x + fx + 6, y + 2, x + fx + 12, y + 16, ORANGE)
+        s.tri(x + fx + 3, y + 16, x + fx + 6, y + 8, x + fx + 9, y + 16,
+              (255, 190, 60))
+    for sx, sy, sr in ((60, 4, 4), (120, 2, 5), (160, 6, 4)):
+        s.disc(x + sx, y + sy, sr, (140, 138, 134))
+    s.bar(x + 10, y + h - 10, 50, 8, RED)
+    s.disc(x + 20, y + h - 4, 3, (15, 15, 15))
+    s.disc(x + 50, y + h - 4, 3, (15, 15, 15))
 
 
 def scene_van(s, x, y, w, h):
@@ -539,16 +535,20 @@ def scene_van(s, x, y, w, h):
     s.bar(x + 61, y + 23, 16, 5, RED)
 
 
-def scene_bed(s, x, y, w, h):
-    s.bar(x, y, w, h, (222, 228, 232))
-    s.bar(x + 16, y + 26, 130, 8, (120, 90, 60))
-    s.bar(x + 16, y + 34, 8, 10, (120, 90, 60))
-    s.bar(x + 138, y + 34, 8, 10, (120, 90, 60))
-    s.bar(x + 24, y + 18, 60, 10, (250, 250, 244))
-    s.disc(x + 34, y + 16, 7, (232, 196, 150))
-    s.bar(x + 44, y + 20, 40, 7, (120, 160, 190))
-    s.bar(x + w - 34, y + 8, 6, 20, RED)
-    s.bar(x + w - 41, y + 15, 20, 6, RED)
+def scene_pope(s, x, y, w, h):
+    s.bar(x, y, w, h, (240, 224, 190))
+    s.bar(x + w // 2 - 2, y + 4, 4, 10, GOLD)
+    s.bar(x + w // 2 - 6, y + 8, 12, 3, GOLD)
+    s.bar(x + 10, y + 26, w - 20, 12, (250, 250, 244))
+    s.bar(x + 14, y + 38, 4, h - 38, (120, 90, 60))
+    s.bar(x + w - 18, y + 38, 4, h - 38, (120, 90, 60))
+    for dx, c in ((30, RED), (65, TEAL), (100, (250, 250, 244)),
+                  (135, GREEN), (170, PURPLE)):
+        s.disc(x + dx, y + 20, 5, (232, 196, 150))
+        s.bar(x + dx - 6, y + 25, 12, 6, c)
+    s.bar(x + 97, y + 25, 6, 6, GOLD)
+    for px in (45, 80, 120, 155):
+        s.disc(x + px, y + 30, 2, (200, 200, 200))
 
 
 def scene_orbit(s, x, y, w, h):
@@ -594,9 +594,9 @@ MAP_SPANS = [
     (26, 24, 24), (26, 62, 62), (27, 24, 24), (28, 24, 24), (29, 24, 24),
 ]
 # pins: (story number, grid col, grid row)
-PINS = [(1, 37, 6), (2, 37, 9), (3, 41, 11), (4, 37, 4), (5, 52, 12),
-        (6, 12, 9), (7, 62, 27), (8, 33, 16), (9, 41, 9), (10, 18, 8),
-        (11, 38, 10), (12, 24, 21)]
+PINS = [(1, 37, 9), (2, 37, 6), (3, 41, 11), (4, 37, 4), (5, 52, 12),
+        (6, 11, 11), (7, 58, 14), (8, 28, 18), (9, 51, 16), (10, 34, 8),
+        (11, 38, 10), (12, 41, 9)]
 
 
 def draw_map(s, x, y, w, h):
@@ -616,20 +616,20 @@ def draw_map(s, x, y, w, h):
 
 # ----------------------------------------------------------------- content
 LEADS = [
+    ("NO DEAL IN ANTALYA", scene_collapse,
+     "1 - ANTALYA, TURKIYE - CLIMATE", "CONFIRMED",
+     "COP31: NO DEAL",
+     "The EU and others reject the final text, which never names fossil "
+     "fuels. President Kurum: there is no consensus, so the decisions are "
+     "not adopted.",
+     "(Reuters, Sowetan, AsiaToday)"),
     ("186 DRONES OVERNIGHT", scene_kyiv,
-     "1 - KYIV, UKRAINE - WAR", "REPORTED",
-     "Russia fires 186 drones in the night",
-     "Air defences down or jam 161 of 186 strike drones, 72 of them "
-     "jet-powered. Strikes at 18 sites; a five-storey block in Dymer is "
-     "destroyed, two hurt, seven feared trapped.",
+     "2 - KYIV, UKRAINE - WAR", "REPORTED",
+     "RUSSIA'S 186 DRONES",
+     "Air defences down or jam 161 of 186 drones, 72 jet-powered. "
+     "Strikes at 18 sites; a block in Dymer is destroyed, two hurt, "
+     "seven feared trapped.",
      "(Ukrainian Air Force via Kyiv Independent)"),
-    ("COP31: FINAL TEXT", scene_cop,
-     "2 - ANTALYA, TURKIYE - CLIMATE", "REPORTED",
-     "Climate deal lands at dawn",
-     "The final text drops the $120bn adaptation target, keeps a 35% "
-     "clean-electricity goal for 2035 and admits 1.5C will be overshot. "
-     "Objections close 03:00 GMT; approval at 06:00.",
-     "(Reuters, BBC, The Guardian)"),
     ("CLAIM VS DENIAL", scene_bahrain,
      "3 - MANAMA, BAHRAIN - IRAN WAR", "CLAIM",
      "Iran claims two US radars hit",
@@ -641,105 +641,85 @@ LEADS = [
 
 CARDS = [
     ("SHIP ABLAZE", scene_ship, "GULF OF FINLAND - SEA",
-     "Sparta II still burning",
-     "Hit by two drones, it drifts in Finnish waters. 16 crew safe.",
-     "(Reuters)"),
+     "SPARTA II", "Hit by two drones; it drifts in Finnish waters. "
+     "16 crew safe.", "(Reuters)", "CONFIRMED"),
     ("723 SEATS", scene_vote, "HONG KONG - ELECTION",
-     "Hong Kong votes for 723 seats",
-     "856 candidates chase 723 seats. Turnout 98.79%, a record.",
-     "(SCMP)"),
+     "HONG KONG", "856 candidates chase 723 seats. Turnout 98.79%, "
+     "a record.", "(SCMP)", "CONFIRMED"),
     ("50 LAPS", scene_f1, "LAS VEGAS - FORMULA 1",
-     "Verstappen wins Las Vegas GP",
-     "35 lead changes; Norris +0.639s, Piastri 3rd.",
-     "(F1)"),
+     "VERSTAPPEN", "35 lead changes; Norris +0.639s, Piastri 3rd.",
+     "(F1)", "CONFIRMED"),
     ("720/9 DECLARED", scene_cricket, "WELLINGTON - CRICKET",
-     "India declare on 720/9",
-     "Rahul 136, Pant 128. Highest Test total ever in New Zealand.",
-     "(ESPNcricinfo)"),
-    ("24 DEAD", scene_boat, "BAYELSA, NIGERIA - DISASTER",
-     "Boat toll rises to 24 dead",
-     "Funeral barge capsizes on the Nun River. 300 feared missing.",
-     "(AP)"),
-    ("2-HR CUTS", scene_power, "TEHRAN, IRAN - ENERGY",
-     "Iran rations electricity",
-     "Rolling cuts up to two hours a day from Sunday.",
-     "(Straits Times)"),
-    ("SEC PROBE", scene_chart, "WASHINGTON - MARKETS",
-     "Nvidia faces SEC probe",
-     "SEC probes accounting; shares fall 14% on Friday.",
-     "(Reuters)"),
+     "INDIA 720/9", "Rahul 136, Pant 128. Highest Test total ever in "
+     "New Zealand.", "(ESPNcricinfo)", "CONFIRMED"),
+    ("26 DEAD", scene_boat, "BAYELSA, NIGERIA - DISASTER",
+     "BOAT TOLL", "Funeral barge capsizes on the Nun River. Recovery "
+     "goes on.", "(RIA)", "REPORTED"),
+    ("36 MISSING", scene_fire, "SERANG, INDONESIA - DISASTER",
+     "CANDY FIRE", "Candy plant burns; 3 dead, 36 workers unaccounted "
+     "for.", "(AP)", "REPORTED"),
+    ("1,300 GUESTS", scene_pope, "VATICAN CITY - FAITH",
+     "POPE 1,300", "Pope Leo XIV hosts 1,300 poor guests for lunch.", "(Vatican News)", "CONFIRMED"),
     ("3 KILLED", scene_van, "GAZA CITY - CEASEFIRE",
-     "Strike hits Gaza aid van",
-     "Three killed in Tal al-Hawa; WCK denies the van.",
-     "(Reuters)"),
-    ("IN INTENSIVE CARE", scene_bed, "BRASILIA, BRAZIL - HEALTH",
-     "Bolsonaro in intensive care",
-     "Bowel obstruction; stable and breathing on his own.",
-     "(Reuters)"),
+     "AID VAN HIT", "Three killed in Tal al-Hawa; WCK denies the van.",
+     "(Reuters)", "REPORTED"),
+    ("2-HR CUTS", scene_power, "TEHRAN, IRAN - ENERGY",
+     "RATIONING", "Rolling cuts up to two hours a day from Sunday.",
+     "(Straits Times)", "REPORTED"),
     ("MERCURY ORBIT", scene_orbit, "SPACE - ESA/JAXA",
-     "BepiColombo reaches Mercury",
-     "After eight years, its X-ray telescope starts work.",
-     "(Wires)"),
+     "MERCURY", "BepiColombo reaches Mercury after eight years.",
+     "(Wires)", "CONFIRMED"),
 ]
 
 BRIEFS = [
-    (14, "KRYVYI RIH - 2 killed, 60 hurt in double-tap (AP)"),
-    (15, "SINALOA - 'El Chapo Isidro' caught; 11 killed (Rtrs)"),
-    (16, "GAZA - 129 bodies found in central Gaza rubble (QNA)"),
-    (17, "JERUSALEM - Eisenkot invites Likud to talks (Reports)"),
-    (18, "TRUMP - Reposts gold 'TrumpCare' card (Fox)"),
-    (19, "ESTONIA - To shut Russia border 1 Dec (Reuters)"),
-    (20, "PATNA - Modi opens 19.76-km Nitish Setu bridge (PTI)"),
-    (21, "WALL STREET - Week: S&P -8.6%, Nasdaq -10% (Wraps)"),
-    (22, "HELSINKI - Russian helicopter over Finland (Reuters)"),
-    (23, "DENMARK - Russian attache expelled (Guardian)"),
-    (24, "LONDON - UK-EU deal: food checks end 2028 (Reports)"),
-    (25, "EU PAYS UKRAINE - EUR 7.9bn, a record (Reports)"),
-    (26, "GUPTA - Jailed 235 months over Pannun plot (AP)"),
-    (27, "ANTHROPIC IPO $93.5bn; Riemann proof only CLAIMED"),
-    (28, "SOUTH AFRICA - 581 women killed in 3 months (Police)"),
-    (29, "CYCLONE AKVAN - Landfall; 3 lakh evacuated (IMD)"),
-    (30, "HORMUZ - 3 tankers hit in the Strait (UKMTO)"),
-    (31, "AIRLINES - Attack warning before Thanksgiving (Rtrs)"),
-    (32, "PARIS - France seeks UN action on Myanmar (Guardian)"),
-    (33, "MAMDANI - Close Rikers Island jail by 2032 (Reports)"),
-    (34, "PRICE - Undisputed welterweight champion (Reports)"),
-    (35, "DEUTSCHE LEAK - $582m Epstein deals flagged (Reports)"),
-    (36, "ANGOLA - About $180m for 10% of De Beers (Reports)"),
+    (14, "KHARTOUM - Drones hit homes; army downs UAVs (AFP)"),
+    (15, "WEMBY 50 - Spurs win 114-91; 50 pts, 19 reb (AP)"),
+    (16, "KRYVYI RIH - 2 killed, 58 hurt in double-tap (AP)"),
+    (17, "GAZA - 129 bodies found in central Gaza rubble (QNA)"),
+    (18, "JERUSALEM - Eisenkot invites Likud talks (Reports)"),
+    (19, "TRUMP - Reposts gold 'TrumpCare' card (Fox)"),
+    (20, "ESTONIA - To shut Russia border 1 Dec (Reuters)"),
+    (21, "EU PAYS UKRAINE - EUR 7.9bn, a record (Reports)"),
+    (22, "GUPTA - Jailed 235 months over Pannun plot (AP)"),
+    (23, "BOLSONARO - 71, still in intensive care (Reuters)"),
+    (24, "TURIN - Zverev v Alcaraz ATP final, 17:00 (ATP)"),
+    (25, "LIVERPOOL - Liverpool v Man Utd, 16:30 (PL)"),
+    (26, "NEPAL - Balendra Shah starts India visit (Reports)"),
 ]
 
 FIGURES = [
-    ("186", "drones fired at Ukraine", "overnight"),
-    ("161", "downed or suppressed", "by air defence"),
-    ("35%", "clean-electricity goal", "for 2035"),
-    ("$120BN", "adaptation target", "dropped"),
-    ("720/9", "India's record Test", "total in New Zealand"),
-    ("98.79%", "Hong Kong turnout,", "a record"),
+    ("186", "drones fired overnight"),
+    ("161", "downed or suppressed"),
+    ("0", "deals adopted at COP31"),
+    ("720/9", "India's record total"),
+    ("98.79%", "Hong Kong turnout"),
+    ("1,300", "guests at Pope's lunch"),
 ]
 
 REGIONS = [
-    ("EUROPE 11", (31, 58, 110)),
-    ("MIDDLE EAST 6", (160, 30, 34)),
-    ("ASIA-PACIFIC 4", GOLD),
-    ("AMERICAS 10", TEAL),
-    ("AFRICA 3", GREEN),
+    ("EUROPE 8", (31, 58, 110)),
+    ("MIDDLE EAST 5", (160, 30, 34)),
+    ("ASIA-PACIFIC 3", GOLD),
+    ("AMERICAS 6", TEAL),
+    ("AFRICA 2", GREEN),
     ("OCEANIA 1", PURPLE),
     ("WORLD 1", SLATE),
 ]
 
 UTC_ITEMS = [
     "03:00 COP31 objections close",
-    "06:00 COP31 approval opens",
+    "06:00 plenary called",
     "08:00 161 of 186 downed",
-    "09:00 HK polls open",
-    "16:30 Liverpool v Utd",
-    "17:00 ATP final, Turin",
+    "09:00 HK polls close",
+    "11:00 COP31 plenary slips",
+    "13:30 press time",
 ]
 
 DATECHECK = [
     "Left out on purpose. First reported Friday or Saturday, so not shown as Sunday's news: the Peru quake (Fri 20 Nov local) / Russia's",
     "400-drone barrage (Thu night-Fri) / missiles land in Poland (19-20 Nov) / Kyiv bridges hit (20 Nov) / ICJ Myanmar ruling (19 Nov) /",
-    "Shenzhen summit (19 Nov) / Anthropic IPO priced $83 (19 Nov) / Kerch Bridge strike (17 Nov). Tonight's real count: 186 drones, not 400.",
+    "Shenzhen summit (19 Nov) / Anthropic IPO priced $83 (19 Nov) / Kerch Bridge strike (17 Nov) / Nvidia SEC probe (Fri 20 Nov) / 'El Chapo",
+    "Isidro' arrest (Sat 21 Nov). Tonight's real count: 186 drones, not 400. And COP31's deal was NOT adopted - the text failed at the plenary.",
 ]
 
 
@@ -750,33 +730,43 @@ def kicker(s, x, y, label):
     s.text(label, x + 5, y + 3, SANS, 1, (255, 255, 255))
 
 
+CHIPCOL = {"CONFIRMED": GREEN, "REPORTED": (36, 90, 140),
+           "CLAIM": GOLD, "PENDING": GREY, "ONGOING": TEAL}
+
+
+def chip(s, x, y, text):
+    w = s.twidth(text, SANS, 1) + 10
+    s.bar(x, y, w, 13, CHIPCOL[text])
+    s.text(text, x + 5, y + 3, SANS, 1, (255, 255, 255))
+    return w
+
+
 def draw_lead(s, x, y, w, lead):
     label, scene, place, tag, head, body, src = lead
-    scene(s, x, y, w, 150)
-    s.frame(x, y, w, 150, INK)
-    kicker(s, x + 4, y + 4, label)
-    s.text(place, x, y + 156, SANS, 1, RED)
-    tw = s.twidth(tag, SANS, 1)
-    s.text(tag, x + w - tw, y + 156, SANS, 1, RED)
+    scene(s, x, y, w, 160)
+    s.frame(x, y, w, 160, INK)
+    chip(s, x + w - 4 - (s.twidth(tag, SANS, 1) + 10), y + 4, tag)
+    s.text(place, x, y + 166, SANS, 1, RED)
     for i, ln in enumerate(wrap(head.upper(), SERIF, 2, w)):
-        s.text(ln, x, y + 168 + i * 19, SERIF, 2, INK)
+        s.text(ln, x, y + 178 + i * 21, SERIF, 2, INK)
     bl = wrap(body, SANS, 1, w)[:4]
-    s.para(bl, x, y + 208, SANS, 1, (40, 40, 44), lh=9)
-    s.text(src, x, y + 246, SANS, 1, GREY)
+    s.para(bl, x, y + 224, SANS, 1, (40, 40, 44), lh=9)
+    s.text(src, x, y + 264, SANS, 1, GREY)
 
 
 def draw_card(s, x, y, w, card):
-    label, scene, place, head, body, src = card
-    s.bar(x, y, w, 112, CREAM2)
-    s.frame(x, y, w, 112, INK)
+    label, scene, place, head, body, src, tag = card
+    s.bar(x, y, w, 126, CREAM2)
+    s.frame(x, y, w, 126, INK)
     scene(s, x + 1, y + 1, w - 2, 44)
     kicker(s, x + 5, y + 5, label)
-    s.text(place, x + 4, y + 48, SANS, 1, RED)
-    hl = wrap(head, SANS, 2, w - 4)[:2]
-    s.para(hl, x + 4, y + 58, SANS, 2, INK, lh=14)
-    s.para(wrap(body, SANS, 1, w - 4)[:2], x + 4, y + 88, SANS, 1,
+    chip(s, x + w - 5 - (s.twidth(tag, SANS, 1) + 10), y + 28, tag)
+    s.text(place, x + 4, y + 49, SANS, 1, RED)
+    hl = wrap(head, SERIF, 2, w - 8)[:1]
+    s.para(hl, x + 4, y + 59, SERIF, 2, INK, lh=18)
+    s.para(wrap(body, SANS, 1, w - 8)[:2], x + 4, y + 89, SANS, 1,
            (40, 40, 44), lh=9)
-    s.text(src, x + 4, y + 104, SANS, 1, GREY)
+    s.text(src, x + 4, y + 113, SANS, 1, GREY)
 
 
 def build():
@@ -784,78 +774,79 @@ def build():
     # top bar
     s.bar(0, 0, W, 20, INK)
     s.text("THE WORLD IN ONE DAY", 8, 6, SANS, 1, (247, 241, 227))
-    rt = "36 STORIES - 7 REGIONS - EVERY ONE DATED SUNDAY 22 NOVEMBER 2026"
+    rt = "26 STORIES - 7 REGIONS - EVERY ONE DATED SUNDAY 22 NOVEMBER 2026"
     s.text(rt, W - 8 - s.twidth(rt, SANS, 1), 6, SANS, 1, (247, 241, 227))
     # masthead
     s.centre("SUNDAY 22 NOVEMBER 2026", 26, SERIF, 5, INK)
-    s.centre("186 DRONES OVER UKRAINE - COP31 DEAL AT DAWN - IRAN'S CLAIM "
-             "MEETS DENIAL", 76, SANS, 2, RED)
-    # figures band
-    cw = 168
-    for i, (num, l1, l2) in enumerate(FIGURES):
-        x0 = 8 + i * cw
-        if i:
-            s.bar(x0 - 1, 96, 1, 46, GREY)
-        s.centre(num, 96, SERIF, 3, RED, x0, x0 + cw)
-        s.centre(l1, 124, SANS, 1, INK, x0, x0 + cw)
-        s.centre(l2, 133, SANS, 1, INK, x0, x0 + cw)
-    s.bar(0, 94, W, 1, INK)
-    s.bar(0, 143, W, 1, INK)
+    s.centre("COP31 COLLAPSES, NO DEAL - IRAN CLAIMS RADAR HITS - "
+             "186 DRONES OVER KYIV", 76, SANS, 2, RED)
     # region bar
     seg = 144
     for i, (name, col) in enumerate(REGIONS):
         x0 = 8 + i * seg
-        s.bar(x0, 145, seg - 2, 16, col)
-        s.centre(name, 149, SANS, 1, (255, 255, 255), x0, x0 + seg - 2)
+        s.bar(x0, 94, seg - 2, 16, col)
+        s.centre(name, 98, SANS, 1, (255, 255, 255), x0, x0 + seg - 2)
     # UTC strip
-    s.bar(0, 163, W, 15, INK)
-    s.text("THE DAY IN UTC", 8, 167, SANS, 1, (255, 214, 110))
+    s.bar(0, 114, W, 15, INK)
+    s.text("THE DAY IN UTC", 8, 118, SANS, 1, (255, 214, 110))
     ux = 8 + s.twidth("THE DAY IN UTC  ", SANS, 1)
     for i, it in enumerate(UTC_ITEMS):
         if i:
-            ux = s.text(" - ", ux, 167, SANS, 1, (255, 214, 110))
-        ux = s.text(it, ux, 167, SANS, 1, (247, 241, 227))
+            ux = s.text(" - ", ux, 118, SANS, 1, (255, 214, 110))
+        ux = s.text(it, ux, 118, SANS, 1, (247, 241, 227))
     # leads
     for i, lead in enumerate(LEADS):
-        draw_lead(s, 8 + i * 340, 180, 328, lead)
+        draw_lead(s, 8 + i * 256, 134, 248, lead)
+    # numbers sidebar
+    sx = 776
+    s.bar(sx, 134, 240, 271, INK)
+    s.text("THE DAY IN NUMBERS", sx + 10, 142, SANS, 1, (255, 214, 110))
+    s.bar(sx + 10, 154, 220, 1, (70, 80, 120))
+    for i, (num, lab) in enumerate(FIGURES):
+        ny = 162 + i * 40
+        s.text(num, sx + 10, ny, SERIF, 3, (255, 214, 110))
+        s.text(lab, sx + 10, ny + 28, SANS, 1, (247, 241, 227))
+        if i < 5:
+            s.bar(sx + 10, ny + 38, 220, 1, (70, 80, 120))
     # day in ten header
-    s.text("THE DAY IN TEN", 8, 452, SERIF, 2, INK)
+    s.text("THE DAY IN TEN", 8, 412, SERIF, 2, INK)
     rh = "THE STORIES THAT MOVED THE WORLD TODAY"
-    s.text(rh, W - 8 - s.twidth(rh, SANS, 1), 456, SANS, 1, GREY)
-    s.bar(8, 466, W - 16, 1, INK)
+    s.text(rh, W - 8 - s.twidth(rh, SANS, 1), 416, SANS, 1, GREY)
+    s.bar(8, 426, W - 16, 1, INK)
     # cards
     for r in range(2):
         for c in range(5):
-            draw_card(s, 8 + c * 203, 472 + r * 118, 195, CARDS[r * 5 + c])
+            draw_card(s, 8 + c * 203, 432 + r * 132, 195, CARDS[r * 5 + c])
     # bottom header
-    s.text("WHERE IT HAPPENED", 8, 706, SERIF, 2, INK)
-    s.text("ALSO ON SUNDAY - 23 MORE STORIES", 344, 706, SERIF, 2, INK)
-    s.bar(8, 720, W - 16, 1, INK)
+    s.text("WHERE IT HAPPENED", 8, 700, SERIF, 2, INK)
+    s.text("ALSO ON SUNDAY - 13 MORE STORIES", 344, 700, SERIF, 2, INK)
+    s.bar(8, 714, W - 16, 1, INK)
     # map + briefs
-    draw_map(s, 8, 726, 322, 214)
+    draw_map(s, 8, 720, 322, 190)
     s.text("Pins match story numbers. 13 BepiColombo: Mercury - no pin on Earth.",
-           8, 942, SANS, 1, GREY)
+           8, 914, SANS, 1, GREY)
     bx = 344
     for col in range(2):
-        items = BRIEFS[col * 12:(col + 1) * 12]
+        items = BRIEFS[col * 7:(col + 1) * 7]
         for j, (n, t) in enumerate(items):
-            s.text(str(n) + " " + t, bx + col * 336, 728 + j * 19, SANS, 1,
+            s.text(str(n) + " " + t, bx + col * 336, 722 + j * 26, SANS, 1,
                    (30, 30, 34))
     # date check
-    s.frame(8, 962, W - 16, 40, RED, t=2)
-    s.bar(8, 962, 104, 40, RED)
-    s.text("DATE", 14, 970, SANS, 2, (255, 255, 255))
-    s.text("CHECK", 14, 984, SANS, 2, (255, 255, 255))
-    s.para(DATECHECK, 120, 965, SANS, 1, (40, 40, 44), lh=9)
+    s.frame(8, 932, W - 16, 52, RED, t=2)
+    s.bar(8, 932, 104, 52, RED)
+    s.text("DATE", 14, 940, SANS, 2, (255, 255, 255))
+    s.text("CHECK", 14, 956, SANS, 2, (255, 255, 255))
+    s.para(DATECHECK, 120, 935, SANS, 1, (40, 40, 44), lh=9)
     # tag legend
     s.text("HOW TO READ THE TAGS - ONGOING still developing / REPORTED one "
            "source's claim / CLAIM a party's claim, contested / FORECAST "
            "still to happen.",
-           8, 1006, SANS, 1, GREY)
+           8, 990, SANS, 1, GREY)
     # footer
-    s.text("Sources: Reuters, BBC, Al Jazeera, AP, Kyiv Independent, SCMP, F1, "
-           "ESPNcricinfo, NEMA, RFE/RL, Straits Times.",
-           8, 1016, SANS, 1, GREY)
+    s.text("Sources: Reuters, AFP, AP, Al Jazeera, Kyiv Independent, "
+           "info.gov.hk, China Daily Asia, formula1.com, ESPNcricinfo, "
+           "RIA, Vanguard, Vatican News, Straits Times, RFE/RL.",
+           8, 1004, SANS, 1, GREY)
     return s
 
 
